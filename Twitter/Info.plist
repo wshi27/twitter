@@ -25,7 +25,7 @@
 			<string>com.codepath.TwitterApp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>alamoTwitter</string>
+				<string>dbOAuth</string>
 			</array>
 		</dict>
 		<dict/>

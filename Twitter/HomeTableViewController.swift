@@ -8,7 +8,7 @@
 
 import UIKit
 
-class HomeTableViewController: UITableViewController {
+class HomeTableViewController: UITableViewController{
 
     var tweetArray = [NSDictionary]()
     var numberOfTweets: Int!
@@ -17,13 +17,17 @@ class HomeTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        tableView.rowHeight = 125
+        tableView.rowHeight = UITableView.automaticDimension
+        //tableView.rowHeight = 150
         
         loadTweets()
         
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
     }
     @objc func loadTweets(){
         numberOfTweets = 20
@@ -66,12 +70,22 @@ class HomeTableViewController: UITableViewController {
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
     }
     
+    func getRelativeTime(timeString: String) -> String{
+        let time: Date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEE MMM d HH:mm:ss Z y"
+        time = dateFormatter.date(from: timeString)!
+        return time.timeAgoDisplay()
+    }
+    
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath) as! TweetCellTableViewCell
         
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
         cell.userNameLabel.text = user["name"] as? String
         cell.tweetContentlLabel.text = tweetArray[indexPath.row]["text"] as? String
+        cell.timeLabel.text = getRelativeTime(timeString: (tweetArray[indexPath.row]["created_at"] as? String)!)
         
         let imageUrl = URL(string: (user["profile_image_url_https"] as? String)!)
         let data = try? Data(contentsOf: imageUrl!)
@@ -79,6 +93,10 @@ class HomeTableViewController: UITableViewController {
         if let imageData = data {
             cell.profileImage.image = UIImage(data: imageData)
         }
+        
+        cell.setFavorite(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
         return cell
     }
     // MARK: - Table view data source
@@ -96,6 +114,26 @@ class HomeTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row + 1 == tweetArray.count{
             loadMoreTweets()
+        }
+    }
+}
+extension Date{
+    func timeAgoDisplay() -> String {
+        let secondAgo = Int(Date().timeIntervalSince(self))
+        let minute = 60
+        let hour = 60 * minute
+        let day = 24 * hour
+        let week = 7 * day
+        if secondAgo < minute{
+            return String("\(secondAgo) sec ago")
+        } else if(secondAgo < hour){
+            return String("\(secondAgo/minute) min ago")
+        } else if(secondAgo < day){
+            return String("\(secondAgo/hour) hr ago")
+        } else if(secondAgo < week){
+            return String("\(secondAgo/day) day ago")
+        } else {
+            return String("\(secondAgo/week) week ago")
         }
     }
 }
