@@ -22,7 +22,8 @@ The following **bonus** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='ezgif.com-gif-maker2.gif' title='Video Walkthrough' width=250'' alt='Video Walkthrough' />
+<img src='ezgif.com-gif-maker2.gif' title='Video Walkthrough' width=250 alt='Video Walkthrough' />
+
 # Twitter - Part I
 
 This is a basic twitter app to read your tweets.
